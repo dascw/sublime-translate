@@ -1,0 +1,21 @@
+//translate.sublime-settings
+{
+    "debug": false,
+
+    // Set source language to language translation will be FROM, i.e. language text is 
+    // originally in.
+    "source_language" : "it",
+
+    // Set target language to language translation will be replaced as, i.e. langauge 
+    // you want the text to be in.
+    "target_language"  : "en",
+
+    // Add symbols here to automatically remove them from strings you're attempting to 
+    // translate. 
+    // @note there are issues with reserved characters in json, e.g ", add a \ in front
+    // of any characters causing issues.
+    "special_symbols" : "['_', ';', '\"']",
+
+    // Add your google cloud API here.
+    "tran_key" : "AIzaSyC56hckAZpM-cdcFc3wxQ7J_kZRHaw1ndw"
+}

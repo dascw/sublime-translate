@@ -1,0 +1,10 @@
+[
+  {
+    "caption": "-"
+  },
+  {
+    "command": "translate",
+    "args": {},
+    "caption": "Translate Selection"
+  }
+]

@@ -1,0 +1,3 @@
+# Example translated artifacts
+examples/*.txt
+examples/*trans.c

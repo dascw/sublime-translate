@@ -1,0 +1,17 @@
+/* Programma Ciao Mondo */
+  ## line: 1
+
+  ## line: 2
+//Bookstores
+  ## line: 3
+#include<stdio.h>
+  ## line: 4
+
+  ## line: 5
+main()
+  ## line: 6
+{
+  ## line: 7
+    printf("Ciao Mondo"); //Note that there will be no response
+  ## line: 8
+}  ## line: 9

@@ -1,0 +1,66 @@
+[
+  {
+    "id": "edit",
+    "children":
+    [
+      {"id": "comment"},
+      {"caption": "Translate Selection", "command": "translate"}
+    ]
+  },
+  {
+    "caption": "Preferences",
+    "mnemonic": "n",
+    "id": "preferences",
+    "children":
+    [
+      {
+        "caption": "Package Settings",
+        "mnemonic": "P",
+        "id": "package-settings",
+        "children":
+        [
+          {
+            "caption": "Translate",
+            "children":
+            [
+              {
+                "command": "open_file", "args":
+                {
+                  "file": "${packages}/Translate/translate.sublime-settings"
+                },
+                "caption": "Settings - Default"
+              },
+              {
+                "caption": "-"
+              },
+              {
+                "command": "open_file",
+                "args": {
+                  "file": "${packages}/Translate/Default (Windows).sublime-keymap",
+                  "platform": "Windows"
+                },
+                "caption": "Key Bindings - User"
+              },
+              {
+                "command": "open_file",
+                "args": {
+                  "file": "${packages}/Translate/Default (Linux).sublime-keymap",
+                  "platform": "Linux"
+                },
+                "caption": "Key Bindings - User"
+              },
+              {
+                "command": "open_file",
+                "args": {
+                  "file": "${packages}/Translate/Default (OSX).sublime-keymap",
+                  "platform": "OSX"
+                },
+                "caption": "Key Bindings - User"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
