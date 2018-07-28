@@ -1,9 +1,10 @@
 /* Programma Ciao Mondo */
 
 //Bookstores
-#include<stdio.h>
+#include <stdio.h>
 
-main()
+int main(void)
 {
-    printf("Ciao Mondo"); //Note that there will be no response
+    printf("Ciao Mondo"); //Note that there will be no answer
+    return 0;
 }

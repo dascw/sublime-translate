@@ -1,18 +1,17 @@
 import operator     # required for sorting algorithm.
-import threading        # required for generating thread per comment.
-import sys      # required for argument handling at command line.
-from subprocess import call         # for clear
+import threading    # required for generating thread per comment.
+import sys          # required for argument handling at command line.
 import json         # required for API key read
-from googleapiclient.discovery import build         # required for google api access
-import codecs     # required for fixing Unicode issues when reading certain files.
+import codecs       # required for fixing Unicode issues when reading certain files.
 import argparse     # ARgument parser module, simplifies line arguments.
 
-__author__ = 'seancwhittaker@gmail.com (Sean Whittaker)'
-__devKey__ = json.load(open('key.json'))['tran_key']
-__version__ = '2.0.1'
+from subprocess import call         # for clear
+from googleapiclient.discovery import build         # required for google api access
 
+__author__      = 'dev.scw@gmail.com'
+__devKey__      = json.load(open('key.json'))['tran_key']
+__version__     = '2.0.2'
 
-file_name = ''
 
 """ Special symbols array contains characters or symbols that, if found in a comment line,
 will be considered as 'commented out code', and will NOT be parsed through translation
@@ -39,19 +38,17 @@ print(args)
 # due to file open requests)
 run_threaded = True
 if args['thread'] == True:
-    print('Running un-threaded..')
+    print('Running un-threaded.')
     run_threaded = False
 
-# Set file name to argument (@note  error thrown if no argument specified, exits safely)
 file_name = args['trans']
 source_language = args['source']
 target_language = args['destination']
 
-""" Class and function declarations.
-"""
 
-class GoogleTran():
+class GoogleTran(object):
     """Returns object for translation.
+
     An object is created each time a translation request is desired in order
     to allow safe threading with the google API.
     """
@@ -74,16 +71,17 @@ class GoogleTran():
                     ).execute()
         return self.tObj
 
-class LineObject():
+class LineObject(object):
     """Object for storing line contents, line number, position of comment."""
     def __init__(self, line_num, str, idx):
         self.number = line_num;
         self.string = str;
         self.idx = idx;
 
-def stringIsNotCode(line):
-    """Searchs parameter string for signs of code, used to check if comment is
-    actually removed code rather than real comment.
+def string_is_not_code(line):
+    """Searchs parameter string for signs of code.
+    
+    Used to check if comment is actually removed code rather than real comment.
 
     Args:
         special_symbols (str array): global declared at top of source file, contains
@@ -100,7 +98,9 @@ def stringIsNotCode(line):
     return ret
 
 class ApiThreadCall(threading.Thread):
-    """As advised by https://developers.google.com/api-client-library/python/guide/thread_safety
+    """Class for managing threaded translate. 
+
+    As advised by https://developers.google.com/api-client-library/python/guide/thread_safety
     Threading is easily achieved by creating a new object. This is because the Google API
     requests are not thread safe!!!!
     Thread execution is delcared in run() member function, thread.start() is required
@@ -111,17 +111,19 @@ class ApiThreadCall(threading.Thread):
         line_num (int): line number of comment read from file.
     """
     def __init__(self, tran_obj, lin_num, timeout=5):
-        self.timeout = timeout;
-        self.lineNum = lin_num;
-        self.tran = tran_obj;
-        self.result = None;
+        self.timeout    = timeout;
+        self.line_num   = lin_num;
+        self.tran       = tran_obj;
+        self.result     = None;
         threading.Thread.__init__(self);
     def run(self):
         self.result = self.tran.execute()
         return
 
-class NoThreadCall():
-    """Use this object when emulating threaded system without creating thread requests.
+class NoThreadCall(object):
+    """Class for managing un-threaded translate. 
+
+    Use this object when emulating threaded system without creating thread requests.
     This method is often used for large files on linux distrbutions as it is more stable
     due to less file pointers being created
 
@@ -130,12 +132,12 @@ class NoThreadCall():
         lin_num (int): line number of comment read from file.
     """
     def __init__(self, string, lin_num):
-        self.result = string;
-        self.lineNum = lin_num;
+        self.result      = string;
+        self.line_num    = lin_num;
 
 
-def handleThreads(threads):
-    """loop through threads, execute handshake and append.
+def handle_threads(threads):
+    """Loops through threads, execute handshake and append.
 
     Args:
         threads (thread array): all thread requests to be serviced.
@@ -155,7 +157,7 @@ def handleThreads(threads):
     print('All threads handled.')
 
 
-def stripCom(line, location):
+def strip_comment(line, location):
     """@note this could probably be encapsulated better.
     Rip out comment returns 'NOT_COM' if no comment found.
 
@@ -169,9 +171,10 @@ def stripCom(line, location):
     return ret_val
 
 
-class ProgressBar():
-    """Displays progress bar while translation is occurring, provides line number
-    over number of lines inside file for parsing.
+class ProgressBar(object):
+    """Displays progress bar while translation is occurring. 
+
+    Provides line number over number of lines inside file for parsing.
 
     Args:
         file_size (int): file size read from entire file.
@@ -212,94 +215,93 @@ Script execution is below:
         7. Process all translations from non-active threads.
         8. Close files, exit().
 """
-print('Starting translation of \'' + file_name + '\'')
+if __name__ == '__main__':
+    print('Starting translation of"{}"'.format(file_name))
+
+    ## Input file
+    try:
+        input_ptr = codecs.open(file_name, 'r', encoding='ISO-8859-1')
+    except FileNotFoundError:
+        print('File name invalid.')
+        exit()
+
+    for file_size, l in enumerate(input_ptr):
+        pass
+
+    # @note fix for bug where if file is temporary file or has no contents (blank),
+    # file_size will causes program to crash. We try/except on file_size here to make sure it is valid.
+    try:
+        file_size
+    except NameError:
+        print('File size generation has failed, likely temporary file or naming issue.')
+        exit()
+
+    progress = ProgressBar(file_size+1)
+
+    input_ptr.seek(0) # resets file pointer back to start.
+
+    # build files for storing output (parsed) and output (converted)
+    out_ptr = codecs.open(file_name[:file_name.find('.')] + '.txt', 'w', 'utf-8')
+    new_file_ptr = codecs.open(file_name[:file_name.find('.')] + '_trans.' + file_name[file_name.find('.') + 1:], 'w', 'utf-8')
 
 
-## Input file
-try:
-    input_ptr =  codecs.open(file_name, 'r', encoding = 'ISO-8859-1')
-except FileNotFoundError:
-    print('File name invalid.')
-    exit()
+    line_num = 0
 
-# Enumerate through lines and get total size.
-for file_size, l in enumerate(input_ptr):
-    pass
+    # Store file info and threads.
+    new_file = []
+    threads = []
 
-# @note fix for bug found by Mike Carter. If file is temporary file or has no contents (blank),
-# file_size will causes program to crash. We try/except on file_size here to make sure it is valid.
-try:
-    file_size
-except NameError:
-    print('File size generation has failed, likely temporary file or naming issue.')
-    exit()
+    # strip comments and store in object list
+    for line in input_ptr:
+        line_num+=1
+        ## append every line read from file.
+        new_file.append(LineObject(line_num, line, 0))
+        # If comment found, start translation thread.
+        comment_loc = line.find('//')
+        comment = strip_comment(line, comment_loc)
+        # Skip if we suspect string is commented out code and not a true comment.
+        if comment != 'NOT_COM' and string_is_not_code(comment):
+            if run_threaded == True:
+                # create thread for each obj.
+                thread = ApiThreadCall(GoogleTran(__devKey__, comment), line_num)       # obj, line_num for reconstrcution
+                # @note unsure why we stored this dx? it's never used? @bug
+                new_file[(line_num-1)].idx = comment_loc       # store comment index for reconstruction.
+                threads.append(thread)
+                thread.start()
+            else: # un-threaded mode, more stable for linux virtual env distributions.
+                new_file[(line_num-1)].idx = comment_loc       # store comment index for reconstruction.
+                tran = GoogleTran(__devKey__, comment)
+                # force translation start.
+                threads.append(NoThreadCall(tran.execute(), line_num))
+        progress.display(line_num)
 
-progress = ProgressBar(file_size+1)
+    # Cleans up display pointer for further messages.
+    progress.clean()
 
-input_ptr.seek(0)       # reset file pointer back to start.
+    if run_threaded == True:
+        # Process all threads.
+        handle_threads(threads)
+    # else we've already handled all requests.
 
-# build files for storing output (parsed) and output (converted)
-out_ptr =  codecs.open(file_name[:file_name.find('.')] + '.txt', 'w', 'utf-8')
-new_file_ptr =  codecs.open(file_name[:file_name.find('.')] + '_trans.' + file_name[file_name.find('.') + 1:], 'w', 'utf-8')
+    thread_idx = 0
+    # Construct file
+    for x in range(len(new_file)):
+        line = new_file[x].string         # read raw line from stored memory.
+        line_num = x+1
+        ## Handles post process of lines after translation, checks if translation was requested
+        ## and if so process line accordingly.
+        # @note Mike found a bug where if no comments were actually found, script would
+        # fail here. Check if length is valid before indexing into thread object.
+        if len(threads) != 0:
+            if threads[thread_idx].line_num == line_num:
+                line = LineObject(line_num, line[:new_file[x].idx] + '//' + threads[thread_idx].result['translations'][0]['translatedText'] + '\n', new_file[x].idx).string
+                thread_idx+=1
+                if thread_idx == len(threads):
+                    thread_idx = 0       #reset to prevent out of range indexing on threads.
+        new_file_ptr.write(line)       # write out to file with translations.
+        out_ptr.write(line + '  ## line: ' + str(line_num) + '\n')      # write out to txt file with list of translations created
 
-# easily keep track of line number
-line_num = 0
-
-# Store file info and threads.
-new_file = []
-threads = []
-
-# strip comments and store in object list
-for line in input_ptr:
-    line_num+=1
-    ## append every line read from file.
-    new_file.append(LineObject(line_num, line, 0))
-    # If comment found, start translation thread.
-    comment_loc = line.find('//')
-    comment = stripCom(line, comment_loc)
-    # Skip if we suspect string is commented out code and not a true comment.
-    if comment != 'NOT_COM' and stringIsNotCode(comment):
-        if run_threaded == True:
-            # create thread for each obj.
-            thread = ApiThreadCall(GoogleTran(__devKey__, comment), line_num)       # obj, line_num for reconstrcution
-            # @note unsure why we stored this dx? it's never used? @bug
-            new_file[(line_num-1)].idx = comment_loc       # store comment index for reconstruction.
-            threads.append(thread)
-            thread.start()
-        else: # un-threaded mode, more stable for linux virtual env distributions.
-            new_file[(line_num-1)].idx = comment_loc       # store comment index for reconstruction.
-            tran = GoogleTran(__devKey__, comment)
-            # force translation start.
-            threads.append(NoThreadCall(tran.execute(), line_num))
-    progress.display(line_num)
-
-# Cleans up display pointer for further messages.
-progress.clean()
-
-if run_threaded == True:
-    # Process all threads.
-    handleThreads(threads)
-# else we've already handled all requests.
-
-thread_idx = 0
-# Construct file
-for x in range(len(new_file)):
-    line = new_file[x].string         # read raw line from stored memory.
-    line_num = x+1
-    ## Handles post process of lines after translation, checks if translation was requested
-    ## and if so process line accordingly.
-    # @note Mike found a bug where if no comments were actually found, script would
-    # fail here. Check if length is valid before indexing into thread object.
-    if len(threads) != 0:
-        if threads[thread_idx].lineNum == line_num:
-            line = LineObject(line_num, line[:new_file[x].idx] + '//' + threads[thread_idx].result['translations'][0]['translatedText'] + '\n', new_file[x].idx).string
-            thread_idx+=1
-            if thread_idx == len(threads):
-                thread_idx = 0       #reset to prevent out of range indexing on threads.
-    new_file_ptr.write(line)       # write out to file with translations.
-    out_ptr.write(line + '  ## line: ' + str(line_num) + '\n')      # write out to txt file with list of translations created
-
-# cleanup
-new_file_ptr.close()
-input_ptr.close()
-out_ptr.close()
+    # cleanup
+    new_file_ptr.close()
+    input_ptr.close()
+    out_ptr.close()

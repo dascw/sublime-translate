@@ -50,6 +50,10 @@ The script must be run in the same folder as your key.json file and the file you
 
 Follow [this guide](https://cloud.google.com/translate/docs/getting-started) for creating an account and generating an API key (it can get a little finicky).
 
+and this guide: https://cloud.google.com/docs/authentication/api-keys?authuser=1&hl=en&authuser=1&visit_id=1-636683862439856814-1794048889&rd=1
+for creating a key
+
+
 To modify default source/target languages, modify the translate.py script:
 ```python
 ap.add_argument("-s", "--source", default='it',
