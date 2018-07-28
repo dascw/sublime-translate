@@ -10,7 +10,7 @@ from googleapiclient.discovery import build         # required for google api ac
 
 __author__      = 'dev.scw@gmail.com'
 __devKey__      = json.load(open('key.json'))['tran_key']
-__version__     = '2.0.2'
+__version__     = '2.0.3'
 
 
 """ Special symbols array contains characters or symbols that, if found in a comment line,
@@ -53,10 +53,11 @@ class GoogleTran(object):
     to allow safe threading with the google API.
     """
     def __init__(self, pKey, stRaw):
-        self.key        = pKey;
-        self.service    = build('translate', 'v2', developerKey=self.key);
-        self.stRaw      = stRaw;
-        self.tObj       = [];         # dictionary object
+        self.key        = pKey
+        self.service    = build('translate', 'v2', developerKey=self.key)
+        self.stRaw      = stRaw
+        self.tObj       = []         # dictionary object
+
     def execute(self):
         """Params are service object (resulting from handshake with GoogleTran
         Raw string for translation (special symbols removed)
@@ -74,12 +75,12 @@ class GoogleTran(object):
 class LineObject(object):
     """Object for storing line contents, line number, position of comment."""
     def __init__(self, line_num, str, idx):
-        self.number = line_num;
-        self.string = str;
-        self.idx = idx;
+        self.number = line_num
+        self.string = str
+        self.idx    = idx
 
 def string_is_not_code(line):
-    """Searchs parameter string for signs of code.
+    """Searches parameter string for signs of code.
     
     Used to check if comment is actually removed code rather than real comment.
 

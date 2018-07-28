@@ -1,6 +1,6 @@
 //translate.sublime-settings
 {
-    "debug": false,
+    "debug": true,
 
     // Set source language to language translation will be FROM, i.e. language text is 
     // originally in.
@@ -17,5 +17,5 @@
     "special_symbols" : "['_', ';', '\"']",
 
     // Add your google cloud API here.
-    "tran_key" : "AIzaSyC56hckAZpM-cdcFc3wxQ7J_kZRHaw1ndw"
+    "tran_key" : "AIzaSyB_vekXZYu7KAUvEHWiG_9XMqpSZZk5qJI"
 }
