@@ -53,10 +53,10 @@ class GoogleTran(object):
     to allow safe threading with the google API.
     """
     def __init__(self, pKey, stRaw):
-        self.key = pKey;
-        self.service = build('translate', 'v2', developerKey = self.key);
-        self.stRaw = stRaw;
-        self.tObj = [];         # dictionary object
+        self.key        = pKey;
+        self.service    = build('translate', 'v2', developerKey=self.key);
+        self.stRaw      = stRaw;
+        self.tObj       = [];         # dictionary object
     def execute(self):
         """Params are service object (resulting from handshake with GoogleTran
         Raw string for translation (special symbols removed)
@@ -143,7 +143,7 @@ def handle_threads(threads):
         threads (thread array): all thread requests to be serviced.
     """
     print('Handling all threads...')
-    temp_threads = threads # local copy
+    temp_threads = threads
     while True:
         next_threads = []
         for thread in temp_threads:
@@ -252,10 +252,11 @@ if __name__ == '__main__':
     threads = []
 
     # strip comments and store in object list
-    for line in input_ptr:
+    for idx, line in enumerate(input_ptr):
         line_num+=1
+
         ## append every line read from file.
-        new_file.append(LineObject(line_num, line, 0))
+        new_file.append(LineObject((idx + 1), line, 0))
         # If comment found, start translation thread.
         comment_loc = line.find('//')
         comment = strip_comment(line, comment_loc)
@@ -263,17 +264,17 @@ if __name__ == '__main__':
         if comment != 'NOT_COM' and string_is_not_code(comment):
             if run_threaded == True:
                 # create thread for each obj.
-                thread = ApiThreadCall(GoogleTran(__devKey__, comment), line_num)       # obj, line_num for reconstrcution
+                thread = ApiThreadCall(GoogleTran(__devKey__, comment), (idx + 1))       # obj, line_num for reconstrcution
                 # @note unsure why we stored this dx? it's never used? @bug
-                new_file[(line_num-1)].idx = comment_loc       # store comment index for reconstruction.
+                new_file[(idx)].idx = comment_loc       # store comment index for reconstruction.
                 threads.append(thread)
                 thread.start()
             else: # un-threaded mode, more stable for linux virtual env distributions.
-                new_file[(line_num-1)].idx = comment_loc       # store comment index for reconstruction.
+                new_file[(idx)].idx = comment_loc       # store comment index for reconstruction.
                 tran = GoogleTran(__devKey__, comment)
                 # force translation start.
-                threads.append(NoThreadCall(tran.execute(), line_num))
-        progress.display(line_num)
+                threads.append(NoThreadCall(tran.execute(), idx + 1))
+        progress.display(idx + 1)
 
     # Cleans up display pointer for further messages.
     progress.clean()
@@ -285,22 +286,19 @@ if __name__ == '__main__':
 
     thread_idx = 0
     # Construct file
-    for x in range(len(new_file)):
-        line = new_file[x].string         # read raw line from stored memory.
-        line_num = x+1
+    for line_num in range(len(new_file)):
+        line = new_file[line_num].string         # read raw line from stored memory.
+        #line_num = x+1
         ## Handles post process of lines after translation, checks if translation was requested
         ## and if so process line accordingly.
-        # @note Mike found a bug where if no comments were actually found, script would
-        # fail here. Check if length is valid before indexing into thread object.
-        if len(threads) != 0:
-            if threads[thread_idx].line_num == line_num:
-                line = LineObject(line_num, line[:new_file[x].idx] + '//' + threads[thread_idx].result['translations'][0]['translatedText'] + '\n', new_file[x].idx).string
+        if len(threads):
+            if threads[thread_idx].line_num == (line_num + 1):
+                line = LineObject(line_num, line[:new_file[line_num].idx] + '//' + threads[thread_idx].result['translations'][0]['translatedText'] + '\n', new_file[line_num].idx).string
                 thread_idx+=1
                 if thread_idx == len(threads):
                     thread_idx = 0       #reset to prevent out of range indexing on threads.
-        new_file_ptr.write(line)       # write out to file with translations.
-        out_ptr.write(line + '  ## line: ' + str(line_num) + '\n')      # write out to txt file with list of translations created
-
+        new_file_ptr.write(line)     
+        out_ptr.write('{}  ## line: {}\n'.format(line, str(line_num + 1)))      # write out to txt file with list of translations created
     # cleanup
     new_file_ptr.close()
     input_ptr.close()
