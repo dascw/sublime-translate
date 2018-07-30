@@ -15,20 +15,6 @@ Often in industry, projects are handed from engineer to engineer, and quite regu
 
 * Download and install [Python](https://www.python.org/downloads/).  
 
-* Append the executable location e.g. "C:\Users\dsikar\AppData\Local\Programs\Python\Python36-32" to PATH variable. On Windows 7 type Windows Key + Pause/Break > Advanced System Settings > System Properties > System Variables > PATH > Edit...  
-
-* Append the scripts folder location, same path as before with added scripts directory e.g. "C:\Users\dsikar\AppData\Local\Programs\Python\Python36-32\Scripts"
-
-* Open command prompt and check versions  
-
-```
-python -V
-```
-
-```
-pip -V
-```
-
 ### How to use the script ###
 
 Use -t switch for file name, -s for source language code (en, es, it, etc) and -d for destination language code.  
