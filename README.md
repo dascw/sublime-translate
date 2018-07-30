@@ -1,12 +1,14 @@
+# Sublime Text - Translation Plugin
+
 The goal of this project was to provide a simple translation tool for use when working on an internationally distributed code base in C/C++.
 Often in industry, projects are handed from engineer to engineer, and quite regularly between countries. During these transitions, code can be left with stray comments (__or all comments!__) in another language, proving difficult to manage.
 
 ### What's in this repository ###
 
-* Script for translating large source files with Google Translate (translate.py).
-	* Version [2.0.1]
 * Plugin for translating files on a line-by-line basis with Google Translate (translate.sublime-package).
 	* Version [1.0.6]
+* Script for translating large source files with Google Translate (translate.py).
+	* Version [2.0.1]
 * (Hopefully, some useful tools to save you some time)
 
 ### Setting up Python, Pip on Windows ###
