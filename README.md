@@ -96,16 +96,16 @@ Select some text and translate.
 Create Google API account and generate API key, follow instructions list above.
 
 * Dependencies
-- translate.py
-	- Python 2.7.12 recommended.
-- install requirements with pip.
+	- translate.py
+		- Python 2.7.12 recommended.
+		- install requirements with pip.
 ```
 pip install -r requirements.txt
 ```
-- translate_plugin.py
-	- Sublime Text 2
-	- Package Control Installed
-		- *ST2 runs its own proprietary version of Python (version 2.6) and bundled modules. The httplib2 module bundled with
+	- translate_plugin.py
+		- Sublime Text 2
+	-	 Package Control Installed
+			- *ST2 runs its own proprietary version of Python (version 2.6) and bundled modules. The httplib2 module bundled with
 		the ST2 Python isn't able to generate HTTPS connections. Installing Package Control will resolve this (you may have to restart ST2 a couple times on prompt).*
 	- Extract 'translate.sublime-package' to Sublime/packages directory (you can get here easily using Preferences -> Browse Packages in ST2) or use Package Control to install from git.
 
