@@ -5,7 +5,7 @@ Often in industry, projects are handed from engineer to engineer, and quite regu
 
 * Script for translating large source files with Google Translate (translate.py).
 	* Version [2.0.1]
-* Plugin for refactoring files on a line-by-line basis with Google Translate (translate.sublime-package).
+* Plugin for translating files on a line-by-line basis with Google Translate (translate.sublime-package).
 	* Version [1.0.6]
 * (Hopefully, some useful tools to save you some time)
 
@@ -29,7 +29,7 @@ pip -V
 
 ### How to use the script ###
 
-Use -t switch for file, -s for source language code (en, es, it, etc) and -d for destination language code.  
+Use -t switch for file name, -s for source language code (en, es, it, etc) and -d for destination language code.  
 ```bash
 python3 translate.py -t {file_name.c/cpp} [-s SOURCE] [-d DESTINATION]
 ```
