@@ -4,14 +4,16 @@
   ## line: 2
 //Bookstores
   ## line: 3
-#include<stdio.h>
+#include <stdio.h>
   ## line: 4
 
   ## line: 5
-main()
+int main(void)
   ## line: 6
 {
   ## line: 7
-    printf("Ciao Mondo"); //Note that there will be no response
+    printf("Ciao Mondo"); //Note that there will be no answer
   ## line: 8
-}  ## line: 9
+    return 0;
+  ## line: 9
+}  ## line: 10
