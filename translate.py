@@ -112,11 +112,12 @@ class ApiThreadCall(threading.Thread):
         line_num (int): line number of comment read from file.
     """
     def __init__(self, tran_obj, lin_num, timeout=5):
-        self.timeout    = timeout;
-        self.line_num   = lin_num;
-        self.tran       = tran_obj;
-        self.result     = None;
-        threading.Thread.__init__(self);
+        self.timeout    = timeout
+        self.line_num   = lin_num
+        self.tran       = tran_obj
+        self.result     = None
+        threading.Thread.__init__(self)
+
     def run(self):
         self.result = self.tran.execute()
         return
@@ -133,8 +134,8 @@ class NoThreadCall(object):
         lin_num (int): line number of comment read from file.
     """
     def __init__(self, string, lin_num):
-        self.result      = string;
-        self.line_num    = lin_num;
+        self.result      = string
+        self.line_num    = lin_num
 
 
 def handle_threads(threads):
@@ -150,9 +151,7 @@ def handle_threads(threads):
         for thread in temp_threads:
             if thread.is_alive():
                 next_threads.append(thread)
-        #print(' - Threads still up: ' + str(len(next_threads)) + '.')
-        if len(next_threads) == 0:      # break when no threads left.
-            break
+        if not next_threads: break
         else:
             temp_threads = next_threads # set and continue
     print('All threads handled.')
@@ -181,27 +180,28 @@ class ProgressBar(object):
         file_size (int): file size read from entire file.
     """
     def __init__(self, file_size, size=30, symbol='=', prog='%', space=''):
-        self.size = size;
-        self.symbol = symbol;
-        self.mod = 0;
-        self.file_size = file_size;
+        self.size = size
+        self.symbol = symbol
+        self.mod = 0
+        self.file_size = file_size
         self.state = '/'
-        self.prog = prog;
-        self.space = space;
+        self.prog = prog
+        self.space = space
+
     def display(self, line_number):
         progress = ((line_number * self.size)/self.file_size)
-        self.prog = ('=' * int(progress))
-        self.space = (' ' * (self.size-int(progress) - 1))
+        self.prog   = ('=' * int(progress))
+        self.space  = (' ' * (self.size-int(progress) - 1))
         if line_number % 20:
             if self.state == '/':
                 self.state = '\\'
             else:
                 self.state = '/'
-        print('\r :' + self.state + ' Progress [' + self.prog + self.space + ']'  + ' Line: ' + str(line_num) + '/' + str(self.file_size), end='')
+        print('\r{} " Progress [{}{}] Line: {}/{}"'.format(self.state, self.prog, self.space, str(line_number), str(self.file_size)), end='')
+    
     def clean(self):
         """Call after ProgressBar to update terminal pointer"""
         print("")
-
 
 """
 Script execution is below:
@@ -245,17 +245,12 @@ if __name__ == '__main__':
     out_ptr = codecs.open(file_name[:file_name.find('.')] + '.txt', 'w', 'utf-8')
     new_file_ptr = codecs.open(file_name[:file_name.find('.')] + '_trans.' + file_name[file_name.find('.') + 1:], 'w', 'utf-8')
 
-
-    line_num = 0
-
     # Store file info and threads.
-    new_file = []
-    threads = []
+    new_file    = []
+    threads     = []
 
     # strip comments and store in object list
     for idx, line in enumerate(input_ptr):
-        line_num+=1
-
         ## append every line read from file.
         new_file.append(LineObject((idx + 1), line, 0))
         # If comment found, start translation thread.
@@ -265,7 +260,7 @@ if __name__ == '__main__':
         if comment != 'NOT_COM' and string_is_not_code(comment):
             if run_threaded == True:
                 # create thread for each obj.
-                thread = ApiThreadCall(GoogleTran(__devKey__, comment), (idx + 1))       # obj, line_num for reconstrcution
+                thread = ApiThreadCall(GoogleTran(__devKey__, comment), (idx + 1))       # obj,  for reconstrcution
                 # @note unsure why we stored this dx? it's never used? @bug
                 new_file[(idx)].idx = comment_loc       # store comment index for reconstruction.
                 threads.append(thread)
@@ -281,25 +276,22 @@ if __name__ == '__main__':
     progress.clean()
 
     if run_threaded == True:
-        # Process all threads.
-        handle_threads(threads)
-    # else we've already handled all requests.
+        handle_threads(threads) # Process all threads.
 
     thread_idx = 0
     # Construct file
-    for line_num in range(len(new_file)):
-        line = new_file[line_num].string         # read raw line from stored memory.
-        #line_num = x+1
-        ## Handles post process of lines after translation, checks if translation was requested
-        ## and if so process line accordingly.
-        if len(threads):
+    for line_num, line_obj in enumerate(new_file):
+        line = line_obj.string         # read raw line from stored memory.
+        ## Handles post process of lines after translation, checks if translation was requested and if so process line accordingly.
+        if threads:
             if threads[thread_idx].line_num == (line_num + 1):
-                line = LineObject(line_num, line[:new_file[line_num].idx] + '//' + threads[thread_idx].result['translations'][0]['translatedText'] + '\n', new_file[line_num].idx).string
+                line = LineObject(line_num, line[:line_obj.idx] + '//' + threads[thread_idx].result['translations'][0]['translatedText'] + '\n', line_obj.idx).string
                 thread_idx+=1
                 if thread_idx == len(threads):
                     thread_idx = 0       #reset to prevent out of range indexing on threads.
         new_file_ptr.write(line)     
         out_ptr.write('{}  ## line: {}\n'.format(line, str(line_num + 1)))      # write out to txt file with list of translations created
+    
     # cleanup
     new_file_ptr.close()
     input_ptr.close()
