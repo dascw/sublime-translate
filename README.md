@@ -99,9 +99,7 @@ Create Google API account and generate API key, follow instructions list above.
 	- translate.py
 		- Python 2.7.12 recommended.
 		- install requirements with pip.
-```
-pip install -r requirements.txt
-```
+		- ```pip install -r requirements.txt```
 	- translate_plugin.py
 		- Sublime Text 2
 	-	 Package Control Installed
