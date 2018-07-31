@@ -5,14 +5,14 @@ import sublime
 import sublime_plugin
 import json
 import ast # required for expansion of string list literals from sublime settings.
-import threading 
-import sys 
+import threading
+import sys
 import os
 
 # path append is required to add site-packages (all dependencies) to path for google modules.
 if sys.platform == 'linux2' or sys.platform == 'linux':
     path = sublime.packages_path()
-    ## @not in some instances, packages_path() returns empty string. 
+    ## @not in some instances, packages_path() returns empty string.
     ## If string is empty, attempt to extract path from expected location in system path.
     ## @note this is not guaranteed to work and may result in undefined behaviour on some systems.
     if not path:
@@ -25,7 +25,7 @@ else:
     # windows
     sys.path.append(os.path.join(sublime.packages_path() + "\\Translate\\site-packages\\"))
 
-from googleapiclient.discovery import build 
+from googleapiclient.discovery import build
 
 __author__      = '(Sean Whittaker)'
 __version__     = '1.0.6'
@@ -44,7 +44,7 @@ def print_verbose(string_arg):
 
 class TranslateCommand(sublime_plugin.TextCommand):
     """Executed command called by user, parses text selected by user and returns translation.
-    
+
     Text is translated according to conditions read from settings.
     NOTE Extends TextCommand so that run() receives a View to modify.
     Args:
@@ -59,13 +59,13 @@ class TranslateCommand(sublime_plugin.TextCommand):
         source      = settings.values.get('source_language') # get language settings from configuration file.
         target      = settings.values.get('target_language')
         __verbose__ = settings.values.get('debug') # for print verbose.
-        threads     = [] 
+        threads     = []
 
         for coord in region:
-            print('Regions detected: {}'.format((coord))) # prints the coordinates of region in characters.
             if coord.empty():
                 print('No text detected.')
             else:
+                print('Regions detected: {0}'.format((coord))) # prints the coordinates of region in characters.
                 # replace text
                 line = self.view.substr(coord)
                 # @note we need to store size of line too.
@@ -75,25 +75,25 @@ class TranslateCommand(sublime_plugin.TextCommand):
                 thread.start()
 
         handle_thread(threads)
-        
+
         offset = 0
-        print_verbose('# Length of threads: {}'.format(str(len(threads))))
+        print_verbose('# Length of threads: {0}'.format(str(len(threads))))
         for thread in threads: #  @note can this be for in ranage instead?
             # @note we were getting confused here!!!
             # we needed to adjust regions based on mutliple cursor points, otherwise each time the region was
             # updated with a size different than original text, we'd get lost (regions defined by num of chars)
-            print_verbose('# Region for result: {}'.format((thread.region)))
+            print_verbose('# Region for result: {0}'.format((thread.region)))
             if thread.result == None:
                 print_verbose('# Translation failed! No result.')
                 continue
             # @note fix added after bug reported by Cesar #3.
             thread.result = self._fix_comment_blocks(thread.result)
-            print('Translate result: {}.'.format(thread.result))
+            print('Translate result: {0}.'.format(thread.result))
             siz_dif = (thread.obj.length - len(thread.result) )
             # update region!
             thread.region = sublime.Region(thread.region.begin() - offset, thread.region.end() - offset)
-            print_verbose('# Offset = {}'.format(str(offset)))
-            print_verbose('# New region: {}'.format(str(thread.region)))
+            print_verbose('# Offset = {0}'.format(str(offset)))
+            print_verbose('# New region: {0}'.format(str(thread.region)))
             offset+=siz_dif
             self.view.replace(edit, thread.region, thread.result)
 
@@ -107,10 +107,10 @@ class TranslateCommand(sublime_plugin.TextCommand):
         Args:
             arg (str): result from translation.
         """
-        print_verbose('Comment block pre: {}'.format(arg))
+        print_verbose('Comment block pre: {0}'.format(arg))
         arg = arg.replace('/ *', '/*') # fix comment block issue with google tran.
         arg = arg.replace('* /', '*/')
-        print_verbose('Comment block post: {}'.format(arg))
+        print_verbose('Comment block post: {0}'.format(arg))
         return arg
 
     def _strip_special_symbols(self, arg):
@@ -125,7 +125,7 @@ class TranslateCommand(sublime_plugin.TextCommand):
         special_symbols = ast.literal_eval(HandleSettings().values.get('special_symbols'))
         for symbol in special_symbols:
             if arg.find(symbol) != -1: # char found
-                print_verbose('# Special symbol found: {}'.format(symbol))
+                print_verbose('# Special symbol found: {0}'.format(symbol))
                 arg = arg.replace(symbol, ' ') # replace with space
         return arg
 
@@ -166,13 +166,13 @@ def handle_thread(threads):
         threads (object Threads): contains all translation threads.
     """
     print('Handling all threads.')
-    
+
     while True:
         next_threads = []
         for thread in threads:
             if thread.is_alive():
                 next_threads.append(thread)
-        if not next_threads: 
+        if not next_threads:
             break
         else:
             threads = next_threads
@@ -193,9 +193,9 @@ class GoogleTran(object):
         self.service    = build('translate', 'v2', developerKey=self.key)
         self.raw_str    = raw_str
         self.length     = len(raw_str) # store length
-        self.result     = []         
-        print_verbose('raw_str: {}'.format(raw_str))
-        
+        self.result     = []
+        print_verbose('raw_str: {0}'.format(raw_str))
+
     def execute(self, source_language, target_language):
         """Params are service object (resulting from handshake with GoogleTran
         Raw string for translation (@note no comment lines/special symbols?)
@@ -204,12 +204,15 @@ class GoogleTran(object):
             source_language (str): language to translate from.
             target_language (str): language to translate to.
         """
-        # translate object.
-        self.result = self.service.translations().list(
-                    source=source_language,
-                    target=target_language,
-                    q=[self.raw_str]
-                    ).execute()
+        try:
+            # translate object.
+            self.result = self.service.translations().list(
+                        source=source_language,
+                        target=target_language,
+                        q=[self.raw_str]
+                        ).execute()
+        except HttpError:
+            print('HttpError detected - check your JSON key is enabled and loaded correctly.')
         return self.result
 
 
