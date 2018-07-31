@@ -15,20 +15,6 @@ Often in industry, projects are handed from engineer to engineer, and quite regu
 
 * Download and install [Python](https://www.python.org/downloads/).  
 
-* Append the executable location e.g. "C:\Users\dsikar\AppData\Local\Programs\Python\Python36-32" to PATH variable. On Windows 7 type Windows Key + Pause/Break > Advanced System Settings > System Properties > System Variables > PATH > Edit...  
-
-* Append the scripts folder location, same path as before with added scripts directory e.g. "C:\Users\dsikar\AppData\Local\Programs\Python\Python36-32\Scripts"
-
-* Open command prompt and check versions  
-
-```
-python -V
-```
-
-```
-pip -V
-```
-
 ### How to use the script ###
 
 Use -t switch for file name, -s for source language code (en, es, it, etc) and -d for destination language code.  
@@ -50,10 +36,7 @@ The script must be run in the same folder as your key.json file and the file you
 }
 ```
 
-Follow [this guide](https://cloud.google.com/translate/docs/getting-started) for creating an account and generating an API key (it can get a little finicky).
-
-and this guide: https://cloud.google.com/docs/authentication/api-keys?authuser=1&hl=en&authuser=1&visit_id=1-636683862439856814-1794048889&rd=1
-for creating a key
+Follow [this guide](https://cloud.google.com/translate/docs/getting-started) for creating an account and generating an API key (it can get a little finicky); and [this guide](https://cloud.google.com/docs/authentication/api-keys?authuser=1&hl=en&authuser=1&visit_id=1-636683862439856814-1794048889&rd=1) for creating a translation key.
 
 
 To modify default source/target languages, modify the translate.py script:
