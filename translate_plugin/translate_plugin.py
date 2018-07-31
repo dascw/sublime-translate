@@ -9,13 +9,16 @@ import threading
 import sys 
 import os
 
-print('loading')
-print(sys.platform)
-
 # path append is required to add site-packages (all dependencies) to path for google modules.
 if sys.platform == 'linux2' or sys.platform == 'linux':
-    sys.path.append(os.path.join(sublime.packages_path() + "/Translate/site-packages/"))
-    print(sys.path)
+    path = sublime.packages_path()
+    ## @not in some instances, packages_path() returns empty string. 
+    ## If string is empty, attempt to extract path from expected location in system path.
+    ## @note this is not guaranteed to work and may result in undefined behaviour on some systems.
+    if not path:
+        path = sys.path[3]
+
+    sys.path.append(os.path.join(path + "/Translate/site-packages/"))
 elif int(sublime.version()) > 3000: # windows path in sublime text 3.
     sys.path.append(sublime.packages_path() + "\\Translate\\site-packages\\")
 else:
@@ -157,7 +160,7 @@ class ApiThreadCall(threading.Thread):
 
 
 def handle_thread(threads):
-    """Loop through threads, execute handshake and append.
+    """loop through threads, execute handshake and append.
 
     Args:
         threads (object Threads): contains all translation threads.
@@ -178,7 +181,6 @@ def handle_thread(threads):
 
 class GoogleTran(object):
     """Returns object for translation.
-
     An object is created each time a translation request is desired in order
     to allow safe threading with the google API.
 
@@ -215,3 +217,4 @@ class HandleSettings(sublime_plugin.ApplicationCommand):
     """Returns settings object for manipulation/reference"""
     def __init__(self, arg='translate.sublime-settings'):
         self.values = sublime.load_settings(arg)
+
